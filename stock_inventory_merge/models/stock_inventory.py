@@ -101,13 +101,15 @@ class StockInventory(models.Model):
                             sum_quantity += from_uom._compute_quantity(
                                 line_data['product_qty'], to_uom)
 
-                # Update the first line with the sumed quantity
-                keeped_line = line_obj.browse(keeped_line_id)
-                keeped_line.write({'product_qty': sum_quantity})
-
                 # Delete all the other lines
                 line_ids.remove(keeped_line_id)
                 line_obj.browse(line_ids).unlink()
+
+                # Only after deleting the other line(s) we can
+                # update the first line with the summed quantity
+                keeped_line = line_obj.browse(keeped_line_id)
+                keeped_line.write({'product_qty': sum_quantity})
+
 
     # Custom Section
     @api.multi
