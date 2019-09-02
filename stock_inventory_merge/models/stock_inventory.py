@@ -57,7 +57,7 @@ class StockInventory(models.Model):
     def complete_with_zero(self):
         line_obj = self.env['stock.inventory.line']
         for inventory in self:
-            product_lines = inventory._get_inventory_lines(inventory)
+            product_lines = inventory._get_inventory_lines_values()
             current_vals = inventory._get_inventory_line_vals()
             for product_line in product_lines:
                 # Check if the line is in the inventory
@@ -74,7 +74,7 @@ class StockInventory(models.Model):
 
     @api.multi
     def action_merge_duplicated_line(self):
-        uom_obj = self.env['product.uom']
+        uom_obj = self.env['uom.uom']
         line_obj = self.env['stock.inventory.line']
         for inventory in self:
             line_group_ids = inventory._get_duplicated_line_ids()
@@ -82,22 +82,24 @@ class StockInventory(models.Model):
                 sum_quantity = 0
                 keeped_line_id = False
                 default_uom_id = False
+                to_uom = False
                 for line_data in line_obj.search_read(
                         [('id', 'in', line_ids)],
                         ['product_qty', 'product_uom_id']):
                     if not keeped_line_id:
                         keeped_line_id = line_data['id']
                         default_uom_id = line_data['product_uom_id'][0]
+                        to_uom = uom_obj.browse(default_uom_id)
                         sum_quantity = line_data['product_qty']
                     else:
                         # Same UoM
                         if default_uom_id == line_data['product_uom_id'][0]:
                             sum_quantity += line_data['product_qty']
                         else:
-                            sum_quantity += uom_obj._compute_qty(
-                                line_data['product_uom_id'][0],
-                                line_data['product_qty'],
-                                to_uom_id=default_uom_id)
+                            from_uom_id = line_data['product_uom_id'][0]
+                            from_uom = uom_obj.browse(from_uom_id)
+                            sum_quantity += from_uom._compute_quantity(
+                                line_data['product_qty'], to_uom)
 
                 # Update the first line with the sumed quantity
                 keeped_line = line_obj.browse(keeped_line_id)
