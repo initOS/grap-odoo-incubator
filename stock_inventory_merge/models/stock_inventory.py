@@ -120,7 +120,7 @@ class StockInventory(models.Model):
                 check_dict[key].append(line_val['id'])
             else:
                 check_dict[key] = [line_val['id']]
-        for k, v in check_dict.iteritems():
+        for k, v in check_dict.items():
             if len(v) > 1:
                 duplicates_group_ids.append(v)
         return duplicates_group_ids
