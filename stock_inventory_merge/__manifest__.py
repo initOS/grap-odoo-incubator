@@ -6,7 +6,7 @@
 {
     'name': 'Stock - Merge Inventories',
     'summary': 'Allow to merge multiples partial inventories',
-    'version': '8.0.1.0.0',
+    'version': '12.0.1.0.0',
     'category': 'Stock',
     'author': 'GRAP',
     'website': 'http://www.grap.coop',
@@ -30,5 +30,5 @@
         'static/description/stock_inventory_form_duplicate.png',
         'static/description/stock_inventory_tree_merge.png',
     ],
-    'installable': False,
+    'installable': True,
 }
